@@ -13,12 +13,13 @@ This app allows you to keep track of every action taken by your users.
 
    *Alternatively, you can download the [latest release](https://github.com/soynatan/django-easy-audit/releases) from GitHub, unzip it, and place the folder 'easyaudit' in the root of your project.*
 
-2. Add 'easyaudit' to your `INSTALLED_APPS` like this:
+2. Add 'easyaudit' and dependencies to your `INSTALLED_APPS` like this:
 
     ```python
     INSTALLED_APPS = [
         ...
         'easyaudit',
+        'django_admin_lightweight_date_hierarchy'
     ]
     ```
 
