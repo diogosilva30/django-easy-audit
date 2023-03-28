@@ -23,14 +23,18 @@ class BaseProcessActionsAdminMixin:
         opts = self.model._meta
 
         redirect_url = add_preserved_filters(
-            {'preserved_filters': preserved_filters, 'opts': opts},
-            request.META.get('HTTP_REFERER', '/'),
+            {"preserved_filters": preserved_filters, "opts": opts},
+            request.META.get("HTTP_REFERER", "/"),
         )
 
         return redirect_url
 
     def process_action(
-        self, request, obj_id, action_key, **kwargs,
+        self,
+        request,
+        obj_id,
+        action_key,
+        **kwargs,
     ):
         action_methods = self.get_action_methods()
         action = action_methods[action_key]
@@ -40,16 +44,16 @@ class BaseProcessActionsAdminMixin:
 
 class CRUDHistoryAdminMixin(BaseProcessActionsAdminMixin, admin.ModelAdmin):
     CRUD_HISTORY = "crud_history"
-    crud_history_translated_title = _('CRUD history')
+    crud_history_translated_title = _("CRUD history")
 
     def get_urls(self) -> list:
         urls = super(CRUDHistoryAdminMixin, self).get_urls()
         info = self._get_path_info()
         crud_history_urls = [
             path(
-                f'<path:object_id>/{self.CRUD_HISTORY}/',
+                f"<path:object_id>/{self.CRUD_HISTORY}/",
                 self.admin_site.admin_view(self.crud_history_view),
-                name=f'%s_%s_{self.CRUD_HISTORY}' % info,
+                name=f"%s_%s_{self.CRUD_HISTORY}" % info,
             ),
         ]
         return crud_history_urls + urls
@@ -57,15 +61,21 @@ class CRUDHistoryAdminMixin(BaseProcessActionsAdminMixin, admin.ModelAdmin):
     def get_action_methods(self) -> dict:
         methods = super(CRUDHistoryAdminMixin, self).get_action_methods()
         methods.update(
-            {self.CRUD_HISTORY: self.crud_history_action,}
+            {
+                self.CRUD_HISTORY: self.crud_history_action,
+            }
         )
         return methods
 
     def crud_history_view(self, request: HttpRequest, object_id: int):
         return self.process_action(request, object_id, self.CRUD_HISTORY)
 
-    def crud_history_action(self, request: HttpRequest, obj: Model) -> HttpResponseRedirect:
-        base_history_url = reverse(f"admin:easyaudit_crudevent_changelist", )
+    def crud_history_action(
+        self, request: HttpRequest, obj: Model
+    ) -> HttpResponseRedirect:
+        base_history_url = reverse(
+            f"admin:easyaudit_crudevent_changelist",
+        )
         app_label, model_name = self._get_path_info()
         content_type = ContentType.objects.get_by_natural_key(app_label, model_name)
         params = {
@@ -83,7 +93,7 @@ class CRUDHistoryAdminMixin(BaseProcessActionsAdminMixin, admin.ModelAdmin):
 
     def get_crud_history_url(self, obj: Model) -> str:
         info = self._get_path_info()
-        return reverse(f'admin:%s_%s_{self.CRUD_HISTORY}' % info, args=[obj.pk])
+        return reverse(f"admin:%s_%s_{self.CRUD_HISTORY}" % info, args=[obj.pk])
 
     def crud_history_link(self, obj: Model) -> str:
         crud_history_url = self.get_crud_history_url(obj=obj)

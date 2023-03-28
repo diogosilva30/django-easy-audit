@@ -56,8 +56,7 @@ def model_delta(old_model, new_model):
         old_value = get_field_value(old_model, field)
         new_value = get_field_value(new_model, field)
         if old_value != new_value:
-            delta[field.name] = [smart_str(old_value),
-                                 smart_str(new_value)]
+            delta[field.name] = [smart_str(old_value), smart_str(new_value)]
 
     if len(delta) == 0:
         delta = None

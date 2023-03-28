@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.http import HttpResponse
-from test_app.models import TestModel, TestUUIDModel, TestBigIntModel
+from test_app.models import TestBigIntModel, TestModel, TestUUIDModel
 
 
 def create_obj(Model):
@@ -26,9 +26,7 @@ def index(request):
 
 def update_obj_view(request):
     name = datetime.now().isoformat()
-    return HttpResponse(update_obj(
-        TestModel, request.GET['id'], name
-    ).id)
+    return HttpResponse(update_obj(TestModel, request.GET["id"], name).id)
 
 
 def create_uuid_obj_view(request):
@@ -37,9 +35,7 @@ def create_uuid_obj_view(request):
 
 def update_uuid_obj_view(request):
     name = datetime.now().isoformat()
-    return HttpResponse(update_obj(
-        TestUUIDModel, request.GET['id'], name
-    ).id)
+    return HttpResponse(update_obj(TestUUIDModel, request.GET["id"], name).id)
 
 
 def create_big_obj_view(request):
@@ -48,6 +44,4 @@ def create_big_obj_view(request):
 
 def update_big_obj_view(request):
     name = datetime.now().isoformat()
-    return HttpResponse(update_obj(
-        TestBigIntModel, request.GET['id'], name
-    ).id)
+    return HttpResponse(update_obj(TestBigIntModel, request.GET["id"], name).id)

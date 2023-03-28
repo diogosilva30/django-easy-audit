@@ -4,7 +4,7 @@ from django.db import models
 
 
 class TestModel(models.Model):
-    name = models.CharField(max_length=50, default='test data')
+    name = models.CharField(max_length=50, default="test data")
 
 
 class TestForeignKey(models.Model):
@@ -21,7 +21,7 @@ class TestUUIDModel(models.Model):
     id = models.UUIDField(
         primary_key=True, unique=True, editable=False, default=uuid.uuid4
     )
-    name = models.CharField(max_length=50, default='test data')
+    name = models.CharField(max_length=50, default="test data")
 
 
 class TestUUIDForeignKey(models.Model):
@@ -42,7 +42,7 @@ class TestUUIDM2M(models.Model):
 
 class TestBigIntModel(models.Model):
     id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=50, default='test data')
+    name = models.CharField(max_length=50, default="test data")
 
 
 class TestBigIntForeignKey(models.Model):

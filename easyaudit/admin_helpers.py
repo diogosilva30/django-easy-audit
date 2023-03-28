@@ -1,22 +1,23 @@
 from django.contrib import admin
-from django.core.exceptions import PermissionDenied
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 
-try: # Django 2.0
+try:  # Django 2.0
     from django.urls import reverse
-except: # Django < 2.0
+except:  # Django < 2.0
     from django.core.urlresolvers import reverse
 
-from django.urls import re_path
-from django.http import HttpResponseRedirect
-from django.utils.translation import gettext_lazy as _
-from django.contrib import messages
-from django.utils.safestring import mark_safe
-from django.utils.html import escape
-from . import settings
-
 import json
+
+from django.contrib import messages
+from django.http import HttpResponseRedirect
+from django.urls import re_path
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
+
+from . import settings
 
 
 def prettify_json(json_string):
@@ -36,7 +37,9 @@ class EasyAuditModelAdmin(admin.ModelAdmin):
     def get_changelist_instance(self, *args, **kwargs):
         changelist_instance = super().get_changelist_instance(*args, **kwargs)
         user_ids = [obj.user_id for obj in changelist_instance.result_list]
-        self.users_by_id = {user.id: user for user in get_user_model().objects.filter(id__in=user_ids)}
+        self.users_by_id = {
+            user.id: user for user in get_user_model().objects.filter(id__in=user_ids)
+        }
         return changelist_instance
 
     def get_readonly_fields(self, request, obj=None):
@@ -48,21 +51,26 @@ class EasyAuditModelAdmin(admin.ModelAdmin):
 
     def user_link(self, obj):
         user = self.users_by_id.get(obj.user_id)
-        #return mark_safe(get_user_link(user))
+        # return mark_safe(get_user_link(user))
         if user is None:
-            return '-'
+            return "-"
         escaped = escape(str(user))
         try:
             user_model = get_user_model()
-            url = reverse("admin:%s_%s_change" % (
-                user_model._meta.app_label,
-                user_model._meta.model_name,
-            ), args=(user.id,))
+            url = reverse(
+                "admin:%s_%s_change"
+                % (
+                    user_model._meta.app_label,
+                    user_model._meta.model_name,
+                ),
+                args=(user.id,),
+            )
             html = '<a href="%s">%s</a>' % (url, escaped)
         except Exception:
             html = escaped
         return mark_safe(html)
-    user_link.short_description = 'user'
+
+    user_link.short_description = "user"
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -76,7 +84,12 @@ class EasyAuditModelAdmin(admin.ModelAdmin):
         info = self.model._meta.app_label, self.model._meta.model_name
         urls = super(EasyAuditModelAdmin, self).get_urls()
         my_urls = [
-            re_path(r'^purge/$', self.admin_site.admin_view(self.purge), {}, name="%s_%s_purge" % info),
+            re_path(
+                r"^purge/$",
+                self.admin_site.admin_view(self.purge),
+                {},
+                name="%s_%s_purge" % info,
+            ),
         ]
         return my_urls + urls
 
@@ -97,7 +110,10 @@ class EasyAuditModelAdmin(admin.ModelAdmin):
         def truncate_table(model):
             if settings.TRUNCATE_TABLE_SQL_STATEMENT:
                 from django.db import connection
-                sql = settings.TRUNCATE_TABLE_SQL_STATEMENT.format(db_table=model._meta.db_table)
+
+                sql = settings.TRUNCATE_TABLE_SQL_STATEMENT.format(
+                    db_table=model._meta.db_table
+                )
                 cursor = connection.cursor()
                 cursor.execute(sql)
             else:
@@ -108,23 +124,31 @@ class EasyAuditModelAdmin(admin.ModelAdmin):
 
         # Check that the user has delete permission for the actual model
         if not request.user.is_superuser:
-           raise PermissionDenied
+            raise PermissionDenied
         if not modeladmin.has_delete_permission(request):
             raise PermissionDenied
 
         # If the user has already confirmed or cancelled the deletion,
         # (eventually) do the deletion and return to the change list view again.
-        if request.method == 'POST':
-            if 'btn-confirm' in request.POST:
+        if request.method == "POST":
+            if "btn-confirm" in request.POST:
                 try:
                     n = modeladmin.model.objects.count()
                     truncate_table(modeladmin.model)
-                    modeladmin.message_user(request, _("Successfully removed %d rows" % n), messages.SUCCESS);
+                    modeladmin.message_user(
+                        request, _("Successfully removed %d rows" % n), messages.SUCCESS
+                    )
                 except Exception as e:
-                    modeladmin.message_user(request, _(u'ERROR') + ': %r' % e, messages.ERROR)
+                    modeladmin.message_user(
+                        request, _("ERROR") + ": %r" % e, messages.ERROR
+                    )
             else:
-                modeladmin.message_user(request, _("Action cancelled by user"), messages.SUCCESS);
-            return HttpResponseRedirect(reverse('admin:%s_%s_changelist' % (opts.app_label, opts.model_name)))
+                modeladmin.message_user(
+                    request, _("Action cancelled by user"), messages.SUCCESS
+                )
+            return HttpResponseRedirect(
+                reverse("admin:%s_%s_changelist" % (opts.app_label, opts.model_name))
+            )
 
         context = {
             "title": _("Purge all %s ... are you sure?") % opts.verbose_name_plural,
@@ -133,8 +157,4 @@ class EasyAuditModelAdmin(admin.ModelAdmin):
         }
 
         # Display the confirmation page
-        return render(
-            request,
-            'admin/easyaudit/purge_confirmation.html',
-            context
-        )
+        return render(request, "admin/easyaudit/purge_confirmation.html", context)

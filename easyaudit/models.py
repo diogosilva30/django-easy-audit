@@ -96,10 +96,12 @@ class LoginEvent(models.Model):
     LOGIN = 0
     LOGOUT = 1
     FAILED = 2
+    LOGIN_MOBILE = 3
     TYPES = (
         (LOGIN, _("Login")),
         (LOGOUT, _("Logout")),
         (FAILED, _("Failed login")),
+        (LOGIN_MOBILE, _("Login mobile")),
     )
     login_type = models.SmallIntegerField(choices=TYPES, verbose_name=_("Event type"))
     username = models.CharField(
