@@ -16,7 +16,7 @@ audit_logger = import_string(LOGGING_BACKEND)()
 
 
 def user_logged_in(sender, request, user, **kwargs):
-    user_agent_string = request.META.get("HTTP_USER_AGENT")
+    user_agent_string = request.META.get("HTTP_USER_AGENT", "")
     user_agent_info = user_agents.parse(user_agent_string)
     try:
         with transaction.atomic(using=DATABASE_ALIAS):
