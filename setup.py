@@ -15,7 +15,7 @@ setup(
     include_package_data=True,
     install_requires=[
         "beautifulsoup4",
-        "django>=2.2,<5.0",
+        "django>=2.2,<6.0",
         "django-admin-lightweight-date-hierarchy==1.1.0",
         "pyyaml",
         "ua-parser",
